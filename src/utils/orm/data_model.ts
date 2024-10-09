@@ -25,13 +25,10 @@ interface FindOptionT {
 export class DataModel<ModelFormT, ModelT extends ModelFormT & BaseModelT> {
   constructor(readonly table: string) {}
 
-  async create(insertForm: ModelFormT, option: CreateOptionT = {}): Promise<ModelT | null> {
-    const created = await this.createMany([insertForm], option);
-
-    if (!created) {
-      return null;
-    }
-    return created[0];
+  async create(insertForm: ModelFormT, option: CreateOptionT = {}): Promise<ModelT> {
+    const db = option.trx ?? knex;
+    const [created] = await db(this.table).insert(insertForm).returning("*") as ModelT[];
+    return created;
   }
 
   async createMany(forms: ModelFormT[], option: CreateOptionT = {}): Promise<ModelT[]> {
@@ -78,10 +75,9 @@ export class DataModel<ModelFormT, ModelT extends ModelFormT & BaseModelT> {
     return deleted[0];
   }
 
-  async deleteMany(fields: Partial<ModelT>, option: DeleteOptionT = {}): Promise<ModelT[]> {
+  async deleteMany(fields: Partial<ModelT>, option: DeleteOptionT = {}) {
     const db = option.trx ?? knex;
-    const deleted = (await db(this.table).delete().where(fields).returning("*")) as ModelT[];
-    return deleted;
+    await db(this.table).delete().where(fields);
   }
 
   async updateOne(
@@ -115,8 +111,8 @@ export class DataModel<ModelFormT, ModelT extends ModelFormT & BaseModelT> {
     return updated;
   }
 
-  async findById(id: idT, option: FindOptionT = {}): Promise<ModelT | null> {
-    const findQuery = this.findQuery({
+  async findById(id: idT, option: FindOptionT = {}): Promise<ModelT> {
+    return this.findQuery({
       builder: (qb, select) => {
         qb.where(`${this.table}.id`, "=", id);
         if (option.builder) {
@@ -124,8 +120,6 @@ export class DataModel<ModelFormT, ModelT extends ModelFormT & BaseModelT> {
         }
       },
     }).first();
-    const fetched = (await findQuery) as ModelT | undefined;
-    return fetched ?? null;
   }
 
   async findOne(fields: Partial<ModelT>, option: FindOptionT = {}): Promise<ModelT | null> {

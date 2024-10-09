@@ -58,15 +58,11 @@ export class BidRoundService {
   }
 
   async get(id: idT, getOpt: GetBidRoundOptionT = {}): Promise<BidRoundT> {
-    const fetched = await bidRoundM.findById(id, {
+    return bidRoundM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
   async list(listOpt: ListBidRoundOptionT): Promise<ListData<BidRoundT>> {

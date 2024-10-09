@@ -208,16 +208,14 @@ export class BidRequestController {
       $creator: true,
     });
 
-    if (request.buyer == null) {
+    if (request.buyer == null) { //TODO
       throw new err.NotExistE("buyer not exist");
     }
-    const buyerUser = await userM.findById(request.buyer.userId);
-    request.buyer.user = buyerUser ?? undefined;
+    request.buyer.user = await userM.findById(request.buyer.userId);
     if (request.creator == null) {
       throw new err.NotExistE("creator not exist");
     }
-    const creatorUser = await userM.findById(request.creator.userId);
-    request.creator.user = creatorUser ?? undefined;
+    request.creator.user = await userM.findById(request.creator.userId);
 
     const buff = await createInvoiceImage(request);
     const base64 = buff.toString("base64");
@@ -250,14 +248,11 @@ export class BidRequestController {
     if (request.buyer == null) {
       throw new err.NotExistE("buyer not exist");
     }
-    const buyerUser = await userM.findById(request.buyer.userId);
-    request.buyer.user = buyerUser ?? undefined;
+    request.buyer.user = await userM.findById(request.buyer.userId);
     if (request.creator == null) {
       throw new err.NotExistE("creator not exist");
     }
-    const creatorUser = await userM.findById(request.creator.userId);
-    request.creator.user = creatorUser ?? undefined;
-
+    request.creator.user = await userM.findById(request.creator.userId);
 
     notifier.invoicePublished(request);
 

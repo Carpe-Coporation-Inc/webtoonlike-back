@@ -23,13 +23,12 @@ export class UserService {
     return created;
   }
 
-  async getMe(id: idT, getOpt: GetUserOptionT): Promise<UserT | null> {
-    const fetched = await userM.findById(id, {
+  async getMe(id: idT, getOpt: GetUserOptionT): Promise<UserT> {
+    return userM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       },
     });
-    return fetched;
   }
 
   async list(opt: ListUserOptionT): Promise<ListData<UserT>> {

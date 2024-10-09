@@ -28,11 +28,11 @@ export class WebtoonLikeController {
     @User() user: UserT,
     @Body() body: CreateWebtoonLikeDto,
   ): Promise<R.CreateRsp> {
-    const { form } = body satisfies R.CreateRqs;
-    if (form.userId !== user.id) {
-      throw new err.ForbiddenE();
-    }
-    const created = await this.service.create(form);
+    const { form } = body;
+    const created = await this.service.create({
+      ...form,
+      userId: user.id
+    });
 
     this.webtoonService.updateAggr(created.webtoonId, { numLike: true })
       .catch((e) => console.warn("updateAggr error", e));

@@ -25,6 +25,9 @@ const envSchema = z.object({
   // Clerk config
   CLERK_PEM_PUBLIC_KEY: z.string(),
 
+  // internal token
+  TOKEN_SECRET_KEY: z.string(),
+
   // AWS config
   AWS_ACCESS_KEY_ID: z.string(),
   AWS_SECRET_KEY_ID: z.string(),

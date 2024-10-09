@@ -29,19 +29,16 @@ export class UserController {
 
     form.sub = sub;
 
-    const created = this.service.createMe(form);
-    return created;
+    return this.service.createMe(form);
   }
 
   @Get("/me")
   async getMe(
-    @Sub() sub: string,
-    @User() user: UserT | null,
+    @User() user: UserT,
     @Query() query: GetUserDto
   ): Promise<R.GetMeRsp> {
     const getOpt = query satisfies R.GetMeRqs;
-    const fetched = user ? await this.service.getMe(user.id, getOpt) : null;
-
+    const fetched = await this.service.getMe(user.id, getOpt);
     return { data: fetched };
   }
 

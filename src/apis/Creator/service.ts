@@ -12,15 +12,11 @@ export class CreatorService {
   constructor() {}
 
   async get(id: idT, getOpt: GetCreatorOptionT = {}): Promise<CreatorT> {
-    const fetched = await creatorM.findById(id, {
+    return creatorM.findById(id, {
       builder: (qb,select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
   async create(form: CreatorFormT): Promise<CreatorT> {

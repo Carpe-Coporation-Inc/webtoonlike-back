@@ -25,15 +25,11 @@ export class WebtoonService {
   }
 
   async get(id: idT, getOpt: GetWebtoonOptionT = {}): Promise<WebtoonT> {
-    const fetched = await webtoonM.findById(id, {
+    return webtoonM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
   async update(id: idT, form: Partial<WebtoonFormT>): Promise<WebtoonT> {

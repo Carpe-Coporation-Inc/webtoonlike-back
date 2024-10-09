@@ -38,7 +38,3 @@ lerna-debug.log*
 /_scripts
 .env
 .env.*
-
-# IDE settings
-.vscode
-.idea

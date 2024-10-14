@@ -24,3 +24,9 @@ export const User = createParamDecorator(
   },
 );
 
+export const UserId = createParamDecorator(
+  (data: unknown, context: ExecutionContext): number => {
+    const request = context.switchToHttp().getRequest();
+    return request.userId;
+  },
+);

@@ -5,7 +5,6 @@ import { TG } from "@/utils/type_generator";
 
 export const bidRequestMessageFormSchema = insertFormSchema.extend({
   bidRequestId: z.number(),
-  userId: z.number(),
   content: z.string(),
 });
 

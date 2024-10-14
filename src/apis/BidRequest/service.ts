@@ -12,15 +12,11 @@ export class BidRequestService {
   constructor() {}
 
   async get(id: idT, getOpt: GetBidRequestOptionT = {}): Promise<BidRequestT> {
-    const fetched = await bidRequestM.findById(id, {
+    return bidRequestM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
   async list(listOpt: ListBidRequestOptionT): Promise<ListData<BidRequestT>> {
@@ -28,6 +24,7 @@ export class BidRequestService {
   }
 
   async create(form: BidRequestFormT): Promise<BidRequestT> {
+    // TODO: Round 사용 안하고 있음
     const round = await bidRoundM.findById(form.roundId);
 
     if (!round) {

@@ -7,6 +7,7 @@ import { listWebtoon } from "./fncs/list_webtoon";
 import { lookupBuilder } from "./fncs/lookup_builder";
 import { updateAggr, type WebtoonAggrOptionT } from "./fncs/update_aggr";
 import type { WebtoonFormT, WebtoonT, GetWebtoonOptionT, ListWebtoonOptionT } from "@/types";
+import { HomeItems } from "@/types/Webtoon.api";
 
 @Injectable()
 export class WebtoonService {
@@ -25,15 +26,11 @@ export class WebtoonService {
   }
 
   async get(id: idT, getOpt: GetWebtoonOptionT = {}): Promise<WebtoonT> {
-    const fetched = await webtoonM.findById(id, {
+    return webtoonM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
   async update(id: idT, form: Partial<WebtoonFormT>): Promise<WebtoonT> {
@@ -53,5 +50,44 @@ export class WebtoonService {
     key = putDevPrefix(key);
     const putUrl = await createSignedUrl(key, mimeType);
     return { putUrl, key };
+  }
+
+  async homeItems(): Promise<HomeItems> {
+    const [popularList, recommendationsList, brandNewList, perGenreList] = await Promise.all([
+      // 인기
+      listWebtoon({
+        $creator: true,
+        bidStatus: "bidding,negotiating",
+        sort: "popular",
+        $myLike: true,
+        limit: 30
+      }),
+      // TODO 기준이 무엇인가
+      // 추천 컨텐츠
+      listWebtoon({
+        $creator: true,
+        bidStatus: "bidding,negotiating",
+        limit: 5
+      }),
+      // 최신 컨텐츠
+      listWebtoon({
+        $creator: true,
+        bidStatus: "bidding,negotiating",
+        sort: "recent",
+        limit: 5
+      }),
+      // 장르별 모아보기
+      listWebtoon({
+        $creator: true,
+        bidStatus: "bidding,negotiating",
+        limit: 10
+      })
+    ]);
+    return {
+      popular: popularList.data,
+      recommendations: recommendationsList.data,
+      brandNew: brandNewList.data,
+      perGenre: perGenreList.data
+    };
   }
 }

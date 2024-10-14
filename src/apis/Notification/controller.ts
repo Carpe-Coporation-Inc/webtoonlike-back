@@ -1,9 +1,9 @@
 import {
-  Controller, Post, Get, Put,
-  Body, Param, Query,
+  Controller, Get, Put,
+  Query,
   UseGuards,
 } from "@nestjs/common";
-import { User } from "@/apis/$tools/decorators";
+import { User, UserId } from "@/apis/$tools/decorators";
 import { UserGuard } from "@/apis/$tools/guards";
 import {
   ListNotificationDto,
@@ -21,11 +21,11 @@ export class NotificationController {
   @UseGuards(UserGuard)
   @Get("/")
   async list(
-    @User() user: UserT,
+    @UserId() userId: number,
     @Query() query: ListNotificationDto,
   ): Promise<R.ListRsp> {
     const getOpt = query satisfies R.ListRqs;
-    if (getOpt.userId !== user.id) {
+    if (getOpt.userId !== userId) {
       throw new err.InvalidDataE("userId not matching");
     }
     return await this.service.list(query);

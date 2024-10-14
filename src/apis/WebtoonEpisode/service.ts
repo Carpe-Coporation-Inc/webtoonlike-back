@@ -72,15 +72,11 @@ export class WebtoonEpisodeService {
   }
 
   async get(id: idT, getOpt: GetWebtoonEpisodeOptionT = {}): Promise<WebtoonEpisodeT> {
-    const fetched = await webtoonEpisodeM.findById(id, {
+    return webtoonEpisodeM.findById(id, {
       builder: (qb, select) => {
         lookupBuilder(select, getOpt);
       }
     });
-    if (!fetched) {
-      throw new err.NotExistE();
-    }
-    return fetched;
   }
 
 

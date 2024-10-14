@@ -1,7 +1,6 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { Request, Response, NextFunction } from "express";
 import { userM } from "@/models/User";
-import * as err from "@/errors";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { env } from "@/env";
 
@@ -10,40 +9,28 @@ import { env } from "@/env";
 export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      const publicKey = (env.CLERK_PEM_PUBLIC_KEY ?? "").replace(/\^/g, "\n");
-
       const cookies = req.cookies;
 
-      let token = cookies["__session"];
+      const token = cookies["__session"];
       if (!token) {
-        token = req.headers.authorization;
+        return next();
       }
 
       if (env.STAGE == "dev" && req.headers["fake-uid"]) {
         const uid = req.headers["fake-uid"] as string;
         const user = await userM.findById(parseInt(uid));
-        if (!user) {
-          throw new err.UnauthorizedE("fake user not found : " + uid);
-        }
         (req as any).sub = user.sub;
         (req as any).user = user;
         return next();
       }
 
+      const publicKey = (env.CLERK_PEM_PUBLIC_KEY ?? "").replace(/\^/g, "\n");
+      const decoded = jwt.verify(token, publicKey );
+      // console.log("decoded: ", decoded);
+      const user = await userM.findOne({ sub: decoded.sub as string });
 
-      if (!token) {
-        return next();
-      }
-
-      if (token) {
-        const decoded = jwt.verify(token, publicKey );
-        // console.log("decoded: ", decoded);
-        const user = await userM.findOne({ sub: decoded.sub as string });
-
-        (req as any).sub = decoded.sub;
-        (req as any).user = user;
-      }
-
+      (req as any).sub = decoded.sub;
+      (req as any).user = user;
 
       return next();
 

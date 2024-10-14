@@ -16,6 +16,7 @@ import {
 import * as err from "@/errors";
 import type * as R from "@/types/Webtoon.api";
 import type { UserT } from "@/types";
+import { HomeItems } from "@/types/Webtoon.api";
 
 
 @Controller("webtoons")
@@ -43,6 +44,12 @@ export class WebtoonController {
       listOpt.meId = user.id;
     }
     return await this.service.list(listOpt);
+  }
+
+
+  @Get("/homeItems")
+  async homeItems(): Promise<HomeItems> {
+    return this.service.homeItems();
   }
 
   @Get("/:id")

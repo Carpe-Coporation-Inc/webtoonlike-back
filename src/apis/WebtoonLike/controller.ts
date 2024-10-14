@@ -1,18 +1,13 @@
 import {
   Controller, Post,
-  Body, Delete, Param,
+  Delete, Param,
   UseGuards, ParseIntPipe,
 } from "@nestjs/common";
 import { UserGuard } from "@/apis/$tools/guards";
-import { User } from "@/apis/$tools/decorators";
-import {
-  CreateWebtoonLikeDto,
-} from "./dtos";
+import { UserId } from "@/apis/$tools/decorators";
 import { WebtoonLikeService } from "./service";
 import { WebtoonService } from "../Webtoon/service";
-import * as err from "@/errors";
 import type * as R from "@/types/WebtoonLike.api";
-import type { UserT } from "@/types";
 
 
 @Controller("webtoon-likes")
@@ -23,39 +18,28 @@ export class WebtoonLikeController {
   ) {}
 
   @UseGuards(UserGuard)
-  @Post("/")
+  @Post("/:id")
   async create(
-    @User() user: UserT,
-    @Body() body: CreateWebtoonLikeDto,
+    @UserId() userId: idT,
+    @Param("id", ParseIntPipe) id: idT,
   ): Promise<R.CreateRsp> {
-    const { form } = body satisfies R.CreateRqs;
-    if (form.userId !== user.id) {
-      throw new err.ForbiddenE();
-    }
-    const created = await this.service.create(form);
+    await this.service.create(id, userId);
 
-    this.webtoonService.updateAggr(created.webtoonId, { numLike: true })
+    // TODO 필요한 동작인가?
+    this.webtoonService.updateAggr(id, { numLike: true })
       .catch((e) => console.warn("updateAggr error", e));
-
-    return created;
   }
 
   @UseGuards(UserGuard)
   @Delete("/:id")
   async remove(
-    @User() user: UserT,
+    @UserId() userId: idT,
     @Param("id", ParseIntPipe) id: idT,
   ): Promise<R.DeleteRsp> {
-    const webtoonLike = await this.service.get(id);
-    if (webtoonLike.userId !== user.id) {
-      throw new err.ForbiddenE();
-    }
-    const deleted = await this.service.remove(id);
+    await this.service.remove(id, userId);
 
-    this.webtoonService.updateAggr(deleted.webtoonId, { numLike: true })
+    this.webtoonService.updateAggr(id, { numLike: true })
       .catch((e) => console.warn("updateAggr error", e));
-
-    return deleted;
   }
 
 

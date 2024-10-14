@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post,
-  Body, Param, Query,
+  Body, Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -8,12 +8,11 @@ import {
   ListBidRequestMessageDto,
 } from "./dtos";
 import { UserGuard } from "@/apis/$tools/guards";
-import { User } from "@/apis/$tools/decorators";
+import { UserId } from "@/apis/$tools/decorators";
 import { BidRequestMessageService } from "./service";
 import { BidRequestService } from "../BidRequest/service";
 import * as err from "@/errors";
 import type * as R from "@/types/BidRequestMessage.api";
-import type { UserT } from "@/types";
 
 
 @Controller("bid-request-messages")
@@ -28,14 +27,11 @@ export class BidRequestMessageController {
   @Post("/")
   async create(
     @Body() body: CreateBidRequestMessageDto,
-    @User() user: UserT,
+    @UserId() userId: idT,
   ): Promise<R.CreateRsp> {
-    const { form } = body satisfies R.CreateRqs;
+    const { form } = body;
 
-    if (user.id !== form.userId) {
-      throw new err.ForbiddenE();
-    }
-
+    // TODO 이 동작이 왜 필요한지 확인
     const bidRequest = await this.bidRequestService.get(form.bidRequestId, { $creator: true });
 
     if (!bidRequest) {
@@ -46,9 +42,10 @@ export class BidRequestMessageController {
     //   throw new err.ForbiddenE("user is not allowed to create message for this bidRequest");
     // }
 
-
-    const created = await this.service.create(form);
-    return created;
+    return this.service.create({
+      ...form,
+      userId
+    });
   }
 
   @Get("/")

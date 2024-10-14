@@ -22,12 +22,8 @@ export class GenreController {
 
 
   @Get("/")
-  async list(
-    @Query() query: ListGenreDto,
-  ): Promise<R.ListRsp> {
-    const listOpt = query satisfies R.ListRqs;
-
-    const { data, nextCursor } = await this.service.list(listOpt);
+  async list(): Promise<R.ListRsp> {
+    const { data, nextCursor } = await this.service.list();
     return { data, nextCursor };
   }
 

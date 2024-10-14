@@ -1,13 +1,14 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import * as err from "@/errors";
 import { env } from "@/env";
+import jwt from "jsonwebtoken";
 
 @Injectable()
 export class SystemGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const isSystem = request.headers["x-system-secret"] == env.SYSTEM_SECRET;
-    if (isSystem == false) {
+    if (!isSystem) {
       throw new err.ForbiddenE("invalid system secret");
     }
     return true;
@@ -29,18 +30,26 @@ export class AuthGuard implements CanActivate {
 
 @Injectable()
 export class UserGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    if (!request.user) {
+    const token = request.headers.authorization;
+    if (!token) {
       throw new err.UnauthorizedE("no user credential found");
     }
+    const payload = await verifyToken(token, {
+      jwtKey: env.SYSTEM_SECRET,
+    });
+    const { webtoonLikeId } = payload.metadata as ClerkUserMetadata;
+    // TODO DB 재검증 고려
+    request.userId = webtoonLikeId;
     return true;
   }
 }
 
 
 import { adminM } from "@/models/Admin";
-import type { AdminT } from "@/types";
+import { AdminT, ClerkUserMetadata } from "@/types";
+import { verifyToken } from "@clerk/backend";
 
 
 export async function checkAdmin(userId: number, roles: Partial<AdminT> = {}): Promise<AdminT> {

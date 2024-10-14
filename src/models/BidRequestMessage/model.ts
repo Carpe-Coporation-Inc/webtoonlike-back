@@ -4,4 +4,3 @@ import type { BidRequestMessageFormT, BidRequestMessageT } from "@/types/BidRequ
 
 const table = "bid_request_messages";
 export const bidRequestMessageM = new DataModel<BidRequestMessageFormT, BidRequestMessageT>(table);
-

@@ -11,7 +11,7 @@ const config: { [key: string]: Knex.Config } = {
       password: env.DB_PASS,
       database: "kenazip_dev",
     },
-    debug: true,
+    // debug: true,
     migrations: {
       directory: "../migrations",
     },

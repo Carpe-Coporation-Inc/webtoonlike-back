@@ -34,11 +34,10 @@ export class WebtoonSqls extends SqlInjector {
 
 
   myLike(meId: idT): QueryBuilder {
-    return knex.select(knex.raw("TO_JSON(wl)"))
-      .from("webtoon_likes AS wl")
-      .whereRaw(`"wl"."webtoonId" = "${this.table}"."id"`)
-      .where("wl.userId", "=", meId)
-      .as("myLike");
+    return knex.select(knex.raw(`EXISTS (
+      SELECT 1 FROM "webtoon_likes" AS wl
+      WHERE "wl"."webtoonId" = "${this.table}"."id" AND "wl"."userId" = ?
+    ) AS "myLike"`), [meId]);
   }
 
   bidRounds(): QueryBuilder {

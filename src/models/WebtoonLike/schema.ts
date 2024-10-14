@@ -4,7 +4,6 @@ import { TG } from "@/utils/type_generator";
 
 
 const webtoonLikeFormZ = {
-  userId: z.number().int().positive().nullable(),
   webtoonId: z.number().int().positive(),
 };
 

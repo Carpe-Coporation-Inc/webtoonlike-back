@@ -90,7 +90,6 @@ export type WebtoonSortT = "recent" | "old" | "popular"
 
 // @type-gen remain
 import { WebtoonEpisodeT } from "./WebtoonEpisode";
-import { WebtoonLikeT } from "./WebtoonLike";
 import { BidRoundT } from "./BidRound";
 import { CreatorT } from "./Creator";
 import { GenreT } from "./Genre";
@@ -100,7 +99,7 @@ export interface WebtoonT extends _WebtoonT {
   episodes?: WebtoonEpisodeT[]
   numEpisode?: number
   numRequest?: number
-  myLike?: WebtoonLikeT
+  myLike?: boolean
   bidRounds?: BidRoundT[]
   genres?: GenreT[]
 }

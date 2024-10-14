@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard, UserGuard, checkAdmin } from "@/apis/$tools/guards";
-import { Sub } from "@/apis/$tools/decorators";
+import { Sub, UserId } from "@/apis/$tools/decorators";
 import { User } from "@/apis/$tools/decorators";
 import { CreateUserDto, GetUserDto, ListUserDto } from "./dtos";
 import { UserService } from "./service";
@@ -29,20 +29,18 @@ export class UserController {
 
     form.sub = sub;
 
-    const created = this.service.createMe(form);
-    return created;
+    return this.service.createMe(form);
   }
 
+  @UseGuards(UserGuard)
   @Get("/me")
   async getMe(
-    @Sub() sub: string,
-    @User() user: UserT | null,
+    @UserId() userId: number,
     @Query() query: GetUserDto
-  ): Promise<R.GetMeRsp> {
+  ): Promise<UserT> {
+    console.log("getMe", userId, query);
     const getOpt = query satisfies R.GetMeRqs;
-    const fetched = user ? await this.service.getMe(user.id, getOpt) : null;
-
-    return { data: fetched };
+    return this.service.getMe(userId, getOpt);
   }
 
   @UseGuards(UserGuard)

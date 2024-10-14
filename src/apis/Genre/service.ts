@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as err from "@/errors";
 import { genreM } from "@/models/Genre";
-import type { GenreFormT, GenreT, ListGenreOptionT, GetGenreOptionT } from "@/types";
+import type { GenreFormT, GenreT, GetGenreOptionT } from "@/types";
 
 @Injectable()
 export class GenreService {
@@ -15,7 +15,7 @@ export class GenreService {
     return fetched;
   }
 
-  async list(listOpt: ListGenreOptionT): Promise<ListData<GenreT>> {
+  async list(): Promise<ListData<GenreT>> {
     const fetched = await genreM.find({
       builder: (qb) => {
         qb.orderBy("rank", "ASC NULLS LAST");

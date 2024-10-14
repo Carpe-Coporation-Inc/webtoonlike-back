@@ -18,7 +18,6 @@ import { CreatorModule } from "@/apis/Creator/module";
 import { GenreModule } from "@/apis/Genre/module";
 import { InvoiceModule } from "@/apis/Invoice/module";
 import { NotificationModule } from "@/apis/Notification/module";
-import { TokenModule } from "@/apis/Token/module";
 import { UserModule } from "@/apis/User/module";
 import { WebtoonModule } from "@/apis/Webtoon/module";
 import { WebtoonEpisodeModule } from "@/apis/WebtoonEpisode/module";
@@ -39,7 +38,6 @@ import { XWebtoonGenreModule } from "@/apis/XWebtoonGenre/module";
     GenreModule,
     InvoiceModule,
     NotificationModule,
-    TokenModule,
     UserModule,
     WebtoonModule,
     WebtoonEpisodeModule,
